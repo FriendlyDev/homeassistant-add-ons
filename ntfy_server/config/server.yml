@@ -1,0 +1,7 @@
+auth-file: "/var/lib/ntfy/user.db"
+auth-users:
+  # admin user for initial setup
+  # admin:changeme
+  - "admin:$2a$12$5U5l4UVmRRG7.pM5ba2yHe3JSPnZuC9HSkTcpQhOlC6WZevvfRd6q:admin"
+enable-signup: true
+enable-login: true

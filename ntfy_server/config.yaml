@@ -1,0 +1,29 @@
+name: "ntfy.sh Server"
+description: "Send push notifications to your phone or desktop using PUT/POST"
+version: "v2.17.0"
+slug: "ntfy_server"
+url: "https://ntfy.sh"
+webui: "http://[HOST]:[PORT:80]"
+startup: "services"
+init: true
+legacy: true
+panel_icon: mdi:message-bulleted
+arch:
+  - aarch64
+  - amd64
+  - armhf
+  - armv7
+  - i386
+ports:
+  80/tcp: 8070
+  25/tcp: null
+  9090/tcp: null
+map:
+  - type: "addon_config"
+    path: "/etc/ntfy"
+    read_only: false
+environment:
+  NTFY_LISTEN_HTTP: ":80"
+  NTFY_CACHE_FILE: "/etc/ntfy/cache.db"
+  NTFY_AUTH_FILE: "/etc/ntfy/auth.db"
+  NTFY_ENABLE_LOGIN: "true"

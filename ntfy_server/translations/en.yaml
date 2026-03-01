@@ -1,0 +1,4 @@
+network:
+  25/tcp: SMTP listen address
+  80/tcp: HTTP listen address
+  9090/tcp: Metrics listen address
