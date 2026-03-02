@@ -1,4 +1,4 @@
-name: Update the ntfy.sh server version from upstream
+name: Update Versions from Upstreams
 
 on:
   schedule:
@@ -6,8 +6,8 @@ on:
   workflow_dispatch:
 
 jobs:
-  update-version-from-upstream:
-    name: Update Config Version From Upstream
+  update-ntfy-server-version-from-upstream:
+    name: Update ntfy Server Config Version From Upstream
     runs-on: ubuntu-latest
 
     permissions:
