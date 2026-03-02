@@ -1,0 +1,100 @@
+name: Update the ntfy.sh server version from upstream
+
+on:
+  schedule:
+    - cron: "0 9 * * *"
+  workflow_dispatch:
+
+jobs:
+  update-version-from-upstream:
+    name: Update Config Version From Upstream
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
+    steps:
+      - name: Clone Upstream Repository
+        id: clone_upstream_repo
+        uses: actions/checkout@v4
+        with:
+          repository: binwiederhier/ntfy
+          token: ${{ github.token }}
+          path: ./upstream
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Get Upstream Latest Release Tag
+        id: get_upstream_latest_tag
+        run: |
+          cd ./upstream
+          UPSTREAM_TAG=$(git describe --tags $(git rev-list --tags --max-count=1))
+          echo "UPSTREAM_TAG=${UPSTREAM_TAG}" >> "$GITHUB_ENV"
+        shell: bash
+        continue-on-error: false
+
+      - name: Checkout current code
+        id: checkout_this_repo
+        uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ github.token }}
+          path: ./this_repo
+          fetch-depth: 0
+          fetch-tags: true
+
+      - name: Get Current Version From Add-On
+        id: get_current_version
+        run: |
+          cd ./this_repo
+          CURRENT_TAG=$(grep 'version:' ntfy_server/config.yaml | cut -d '"' -f 2)
+          if [ -z "$CURRENT_TAG" ]; then
+            CURRENT_TAG="latest"
+          fi
+          cd ..
+          echo "CURRENT_TAG=${CURRENT_TAG}" >> "$GITHUB_ENV"
+        shell: bash
+        continue-on-error: false
+
+      - name: Compare Versions and Proceed
+        id: compare_versions
+        run: |
+          UPSTREAM_TAG="${{ env.UPSTREAM_TAG }}"
+          CURRENT_TAG="${{ env.CURRENT_TAG }}"
+
+          if [[ "latest" == "$UPSTREAM_TAG" ]]; then
+            echo "Upstream Tag Fetching Failed"
+            echo "UPDATE_REQUIRED=false" >> "$GITHUB_ENV"
+          elif [[ "$UPSTREAM_TAG" == "$CURRENT_TAG" ]]; then
+            echo "Versions are the same. No update required."
+            echo "UPDATE_REQUIRED=false" >> "$GITHUB_ENV"
+          elif [[ "$(printf '%s\n%s\n' "$CURRENT_TAG" "$UPSTREAM_TAG" | sort -V | head -n 1)" == "$CURRENT_TAG" ]]; then
+            echo "Upstream tag is newer. Update required."
+            echo "UPDATE_REQUIRED=true" >> "$GITHUB_ENV"
+          else
+            echo "Current tag is newer or equal. No update required."
+            echo "UPDATE_REQUIRED=false" >> "$GITHUB_ENV"
+          fi
+        shell: bash
+
+      - name: Update Add-On Version In config.yaml
+        id: update_version_in_config
+        if: env.UPDATE_REQUIRED == 'true'
+        run: |
+          cd ./this_repo
+          sed -i "s/version: \".*\"/version: \"$UPSTREAM_TAG\"/" ntfy_server/config.yaml
+          cd ..
+        shell: bash
+
+      - name: Commit and push changes
+        id: commit_changes
+        if: env.UPDATE_REQUIRED == 'true'
+        run: |
+          cd ./this_repo
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --global user.name "github-actions[bot]"
+          git add ntfy_server/config.yaml
+          git commit -m "Update \"ntfy_server\" config version tag to \"${UPSTREAM_TAG}\""
+          git push origin master
+        shell: bash
+
