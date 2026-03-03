@@ -5,7 +5,7 @@
 > This is handled by the configuration tab.  
 
 
-- The `/addons_config/b6e75a8c_ntfy_server` folder is mapped to `/etc/ntfy`. This folder is where everything will go.  
+- The `/config/ntfy_server` folder is mapped to `/etc/ntfy`. This folder is where everything will go.  
 
 - There is a `server.yml.example` thats downloaded from the ntfy.sh GitHub - [https://github.com/binwiederhier/ntfy/blob/main/server/server.yml](https://docs.ntfy.sh/config)  
 
