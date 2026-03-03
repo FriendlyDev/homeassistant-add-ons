@@ -1,9 +1,8 @@
 ARG BUILD_VERSION
 FROM binwiederhier/ntfy:$BUILD_VERSION
 
-COPY config/server.yml /server.yml.default
+COPY rootfs /
 
-COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh
 
 ENTRYPOINT ["/entrypoint.sh"]
