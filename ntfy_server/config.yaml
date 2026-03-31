@@ -1,6 +1,6 @@
 name: "ntfy.sh Server"
 description: "Send push notifications to your phone or desktop using PUT/POST"
-version: "v2.20.1"
+version: "v2.21.0"
 slug: "ntfy_server"
 url: "https://ntfy.sh"
 webui: "http://[HOST]:[PORT:80]"
